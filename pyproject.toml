@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "movie-search"
+version = "0.1.0"
+description = ""
+authors = ["ac2393921 <ac2393921@gmail.com>"]
+readme = "README.md"
+packages = [{include = "movie_search"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+elasticsearch = "^8.9.0"
+pydantic = "1.10"
+fasttext = {git = "https://github.com/cfculhane/fastText"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
