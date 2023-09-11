@@ -35,13 +35,16 @@ RUN apt-get update \
     # deps for installing poetry
     curl \
     # deps for building python deps
-    build-essential
+    build-essential \
+    gcc libmariadb-dev
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR $PYSETUP_PATH
-COPY pyproject.toml poetry.lock ./
+COPY api/pyproject.toml api/poetry.lock api/ ./
 RUN poetry install
+
+ENV PYTHONPATH /src
 
 FROM builder-base as develop
 COPY --from=builder-base $PYSETUP_PATH/.venv/lib/$PYTHON_VERSHIN/site-packages /user/local/lib/$PYTHON_VERSHIN/site-packages

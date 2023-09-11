@@ -3,10 +3,26 @@ services:
   api:
     build:
       context: .
+      dockerfile: api/docker/Dockerfile
+      target: develop
+    volumes:
+      - ./:/src
+    working_dir: "/src"
+    tty: true
+    ports: 
+      - "5000:5000"
+    restart: always
+    depends_on:
+      - db
+    command: ["uvicorn", "api.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
+
+  be:
+    build:
+      context: .
       dockerfile: docker/Dockerfile
     tty: true
     ports:
-      - '8080:8080'
+      - '8081:8081'
     depends_on:
       - db
     volumes:

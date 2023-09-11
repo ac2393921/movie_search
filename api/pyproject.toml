@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "serch-api"
+version = "0.1.0"
+description = ""
+authors = ["ac2393921 <ac2393921@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+black = "^23.9.1"
+flake8 = "^6.1.0"
+fastapi = "^0.103.1"
+uvicorn = "^0.23.2"
+elasticsearch = "^8.9.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
