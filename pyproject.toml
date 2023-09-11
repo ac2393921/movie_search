@@ -4,13 +4,18 @@ version = "0.1.0"
 description = ""
 authors = ["ac2393921 <ac2393921@gmail.com>"]
 readme = "README.md"
-packages = [{include = "movie_search"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 elasticsearch = "^8.9.0"
 pydantic = "1.10"
 fasttext = {git = "https://github.com/cfculhane/fastText"}
+SQLAlchemy = "^2.0.19"
+mysql-connector-python = "^8.1.0"
+pandas = "^2.0.3"
+SQLAlchemy-Utils = "^0.41.1"
+black = "^23.9.0"
+flake8 = "^6.1.0"
 
 
 [build-system]

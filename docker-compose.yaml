@@ -1,5 +1,17 @@
 version: "3.9"
 services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    tty: true
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+    volumes:
+      - .:/src
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.0.0
     environment:
@@ -18,3 +30,22 @@ services:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     ports:
       - 5601:5601
+
+  db:
+    image: mysql:8.0.27
+    platform: linux/amd64
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: movie
+      MYSQL_DATABASE: movie
+      MYSQL_USER: movie
+      MYSQL_PASSWORD: movie
+      TZ: "Asia/Tokyo"
+    ports:
+      - "13306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
