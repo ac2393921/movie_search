@@ -41,7 +41,7 @@ RUN apt-get update \
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR $PYSETUP_PATH
-COPY api/pyproject.toml api/poetry.lock api/ ./
+COPY pyproject.toml poetry.lock ./
 RUN poetry install
 
 ENV PYTHONPATH /src
