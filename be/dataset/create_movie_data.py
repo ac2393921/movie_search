@@ -5,16 +5,16 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from api.models.base import Base
-from api.models.cast import Cast
-from api.models.cast_movie import CastMovie
-from api.models.content_type import ContentType
-from api.models.director import Director
-from api.models.genre import Genre
-from api.models.genre_movie import GenreMovie
-from api.models.movie import Movie
-from api.models.movie_porduction_country import MoviePorductionCountry
-from api.models.production_country import ProductionCountry
+from be.models.base import Base
+from be.models.cast import Cast
+from be.models.cast_movie import CastMovie
+from be.models.content_type import ContentType
+from be.models.director import Director
+from be.models.genre import Genre
+from be.models.genre_movie import GenreMovie
+from be.models.movie import Movie
+from be.models.movie_porduction_country import MovieProductionCountry
+from be.models.production_country import ProductionCountry
 
 
 class SessionHandler:
@@ -218,7 +218,7 @@ class DBDataManager:
             )
 
             for production_countory in production_countory_list:
-                movie_production_countory = MoviePorductionCountry(
+                movie_production_countory = MovieProductionCountry(
                     movie_id=id, production_country_id=production_countory.id
                 )
                 self._session.add(movie_production_countory)

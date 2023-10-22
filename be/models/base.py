@@ -7,6 +7,6 @@ host = "db"
 db_name = "movie"
 
 # engineの設定
-engine = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{db_name}')
+engine = create_engine(f"mysql+mysqlconnector://{user}:{password}@{host}/{db_name}")
 
 Base = declarative_base()

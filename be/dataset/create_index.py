@@ -1,10 +1,9 @@
-import csv
-
 from elasticsearch import Elasticsearch, helpers
 from pydantic import BaseSettings, Field
+from sqlalchemy.orm import joinedload
 
-from api.dataset.create_movie_data import create_session_handler
-from api.models.movie import Movie
+from be.dataset.create_movie_data import create_session_handler
+from be.models.movie import Movie
 
 
 class OpenSearchConnectnionSeetings(BaseSettings):
@@ -31,27 +30,66 @@ mapping = {
         "properties": {
             "title": {"type": "text"},
             "description": {"type": "text"},
+            "genres": {
+                "type": "nested",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {"type": "text", "analyzer": "standard"},
+                },
+            },
+            "casts": {
+                "type": "nested",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {"type": "text", "analyzer": "standard"},
+                },
+            },
+            "production_countries": {
+                "type": "nested",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {"type": "text", "analyzer": "standard"},
+                },
+            },
+            "director": {
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {"type": "text", "analyzer": "standard"},
+                },
+            },
+            "content_type": {"type": "integer"},
+            "release_date": {"type": "date"},
+            "score": {"type": "float"},
         },
     }
 }
-
-
-# with open("./data/movies.csv", encoding="utf-8") as f:
-#     reader = csv.DictReader(f)
-#     helpers.bulk(es, reader, index="movies")
-# helpers.bulk(es, reader, index="movies", doc_type="movie")
 
 
 def gendata(movie_list):
     es_movies = []
 
     for movie in movie_list:
-        es_movies.append(
-            {
-                "title": movie.title,
-                "description": movie.description,
-            },
-        )
+        movie_dict = {
+            "title": movie.title,
+            "description": movie.description,
+            "genres": [{"id": genre.id, "name": genre.name} for genre in movie.genres],
+            "casts": [{"id": cast.id, "name": cast.name} for cast in movie.casts],
+            "production_countries": [
+                {"id": production_country.id, "name": production_country.name}
+                for production_country in movie.productin_countries
+            ],
+            "release_date": movie.release_date,
+            "score": movie.score,
+        }
+        if movie.director:
+            movie_dict["director"] = {
+                "id": movie.director.id,
+                "name": movie.director.name,
+            }
+        if movie.content_type:
+            movie_dict["content_type"] = movie.content_type.id
+
+        es_movies.append(movie_dict)
 
     for movie in es_movies:
         yield {"_op_type": "create", "_index": "movies", "_source": movie}
@@ -65,7 +103,15 @@ if __name__ == "__main__":
         db_name="movie",
     )
     session = session_handler.get_session()
-    movie_list = session.query(Movie.title, Movie.description).all()
+    movie_list = (
+        session.query(Movie)
+        .options(joinedload(Movie.director))
+        .options(joinedload(Movie.content_type))
+        .options(joinedload(Movie.genres))
+        .options(joinedload(Movie.casts))
+        .options(joinedload(Movie.productin_countries))
+        .all()
+    )
 
     try:
         es.indices.create(index="movies", body=mapping)
