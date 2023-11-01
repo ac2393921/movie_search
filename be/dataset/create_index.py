@@ -1,9 +1,13 @@
+from logging import getLogger
+
 from elasticsearch import Elasticsearch, helpers
 from pydantic import BaseSettings, Field
 from sqlalchemy.orm import joinedload
 
 from be.dataset.create_movie_data import create_session_handler
 from be.models.movie import Movie
+
+logger = getLogger(__name__)
 
 
 class OpenSearchConnectnionSeetings(BaseSettings):
@@ -28,6 +32,7 @@ es = Elasticsearch("http://elasticsearch:9200")
 mapping = {
     "mappings": {
         "properties": {
+            "id": {"type": "keyword"},
             "title": {"type": "text"},
             "description": {"type": "text"},
             "genres": {
@@ -70,6 +75,7 @@ def gendata(movie_list):
 
     for movie in movie_list:
         movie_dict = {
+            "id": movie.id,
             "title": movie.title,
             "description": movie.description,
             "genres": [{"id": genre.id, "name": genre.name} for genre in movie.genres],
@@ -81,11 +87,13 @@ def gendata(movie_list):
             "release_date": movie.release_date,
             "score": movie.score,
         }
+
         if movie.director:
             movie_dict["director"] = {
                 "id": movie.director.id,
                 "name": movie.director.name,
             }
+
         if movie.content_type:
             movie_dict["content_type"] = movie.content_type.id
 
@@ -96,6 +104,7 @@ def gendata(movie_list):
 
 
 if __name__ == "__main__":
+    logger.info("Movieインデックスを作成します")
     session_handler = create_session_handler(
         user="movie",
         password="movie",

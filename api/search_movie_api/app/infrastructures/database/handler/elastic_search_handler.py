@@ -15,7 +15,7 @@ class ElasticSearchHandler(SearchEngineHandler):
         return Elasticsearch("http://elasticsearch:9200")
         # return Elasticsearch([{"host": self._es_host, "port": self._es_port}])
 
-    def search(self, index, query):
+    def search(self, index, query, size=100):
         es_client = self.get_client()
-        result = es_client.search(index=index, body=query)
+        result = es_client.search(index=index, body=query, size=size)
         return result

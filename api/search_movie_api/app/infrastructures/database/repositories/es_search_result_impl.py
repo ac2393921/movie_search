@@ -10,6 +10,72 @@ from app.infrastructures.database.handler.search_engine_handler import (
 )
 
 
+class ElasticSearchQueryBuilder:
+    def __init__(self):
+        self._query = {}
+
+    def build_match_query(self, field, value):
+        return {"match": {field: value}}
+
+    def build_nested_query(self, path, nested_field, value):
+        return {
+            "nested": {
+                "path": path,
+                "query": {"match": {f"{path}.{nested_field}": value}},
+            }
+        }
+
+    def build_bool_query(self, must=None, must_not=None, should=None):
+        bool_query = {"bool": {}}
+
+        if must:
+            bool_query["bool"]["must"] = must
+        if must_not:
+            bool_query["bool"]["must_not"] = must_not
+        if should:
+            bool_query["bool"]["should"] = should
+        if filter:
+            bool_query["bool"]["filter"] = filter
+
+        self._query["query"] = bool_query
+
+        return self._query
+
+
+class SearchQueryBuilder(ElasticsearchQueryBuilder):
+    def __init__(self):
+        self._should_queries = []
+        self._must_queries = []
+        self._must_not_queries = []
+
+    def build_query(self, keyword=None):
+        self._should_queries = []
+        if keyword:
+            self.build_match_query("title", keyword)
+        self._should_queries.append(self.build_match_query("title", keyword))
+        if keyword:
+            self.build_match_query("description", keyword)
+
+        if keyword:
+            self.build_nested_query("genres", "name", keyword)
+
+        if keyword:
+            self.build_match_query("director.name", keyword)
+
+        if keyword:
+            self.build_nested_query("casts", "name", keyword)
+
+        if keyword:
+            self.build_nested_query("production_countries", "name", keyword)
+
+        if keyword:
+            self.build_function_score_query("score")
+
+        query = {"query": {"bool": {"should": should_queries}}}
+
+        return query
+
+
 class EsSearchResultRepositoryImpl(SearchResultRepositoryIf):
     def __init__(self, handler: SearchEngineHandler) -> None:
         self._handler = handler
@@ -53,7 +119,7 @@ class EsSearchResultRepositoryImpl(SearchResultRepositoryIf):
                 }
             }
         }
-        es_results = self._handler.search(index="movies", query=query)["hits"]
+        es_results = self._handler.search(index="movies", query=query, size=100)["hits"]
 
         movies: List[Movie] = []
         for es_result in es_results["hits"]:
