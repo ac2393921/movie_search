@@ -2,11 +2,11 @@ version: "3.9"
 services:
   api:
     build:
-      context: .
-      dockerfile: api/docker/Dockerfile
+      context: ./api/search_movie_api
+      dockerfile: docker/Dockerfile
       target: develop
     volumes:
-      - ./:/src
+      - ./api/search_movie_api/:/src
     working_dir: "/src"
     tty: true
     ports: 
@@ -14,7 +14,7 @@ services:
     restart: always
     depends_on:
       - db
-    command: ["uvicorn", "api.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
+    command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
 
   be:
     build:
@@ -62,6 +62,15 @@ services:
       - "13306:3306"
     volumes:
       - db_data:/var/lib/mysql
+
+  fe:
+    build:
+      context: ./fe
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./fe/src:/opt/app
+    ports:
+      - "3000:3000"
 
 volumes:
   db_data:
