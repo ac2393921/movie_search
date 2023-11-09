@@ -72,5 +72,42 @@ services:
     ports:
       - "3000:3000"
 
+  mongo:
+    image: mongo
+    command: --replSet rs0
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+      - "28017:28017"
+    volumes:
+      - ./data/mongo:/data/db
+    networks:
+      - app-net
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://@mongo:27017/
+      ME_CONFIG_MONGODB_SERVER: mongo
+    networks:
+      - app-net
+
+  auth-redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./data/redis:/data"
+
 volumes:
   db_data:
+
+networks:
+  app-net:
+    driver: bridge
