@@ -22,7 +22,7 @@ services:
       dockerfile: docker/Dockerfile
     tty: true
     ports:
-      - '8081:8081'
+      - '8080:8080'
     depends_on:
       - db
     volumes:
@@ -62,6 +62,7 @@ services:
       - "13306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./docker/mysql:/docker-entrypoint-initdb.d
 
   fe:
     build:
@@ -104,6 +105,22 @@ services:
       - "6379:6379"
     volumes:
       - "./data/redis:/data"
+
+  auth-api:
+    build:
+      context: ./api/auth
+      dockerfile: docker/Dockerfile
+      target: develop
+    volumes:
+      - ./api/auth/:/src
+    working_dir: "/src"
+    tty: true
+    ports: 
+      - "5001:5001"
+    restart: always
+    depends_on:
+      - db
+    command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "5001"]
 
 volumes:
   db_data:
