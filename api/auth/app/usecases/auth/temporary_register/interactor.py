@@ -1,37 +1,54 @@
-from app.domain.domain_service.user_domain_service import UserDomainService
+from logging import getLogger
+
+from app.domain.domain_service.user_existence_checker import \
+    UserExistenceChecker
+from app.domain.entities.temp_user import TempUser
+from app.domain.repositories.temp_user.temp_user_repository import \
+    TempUserRepository
 from app.domain.repositories.user.user_repository import UserRepository
-from app.domain.value_object.password import Password
-from app.usecases.auth.temporary_register.input_port import TemporaryRegisterInputPort
-from app.usecases.auth.temporary_register.output_port import TemporaryRegisterOutputPort
+from app.usecases.auth.temporary_register.input_port import \
+    TemporaryRegisterInputPort
+from app.usecases.auth.temporary_register.output_port import \
+    TemporaryRegisterOutputPort
+
+logger = getLogger("uvicorn.app")
 
 
 class TemporaryRegisterInteractor:
-    def __init__(self, user_repository: UserRepository) -> None:
+    def __init__(
+        self,
+        user_repository: UserRepository,
+        temp_user_repository: TempUserRepository,
+    ) -> None:
         self._user_repository = user_repository
+        self._temp_user_repository = temp_user_repository
 
     def handle(self, input: TemporaryRegisterInputPort):
         # 登録可能なメールか確認
-        user_domain_service = UserDomainService(
+        user_existence_checker = UserExistenceChecker(
             user_repository=self._user_repository,
         )
-        user_domain_service.exist_by_email(input.email)
+        user_existence_checker.check_by_email(input.email)
+        logger.info(f"登録可能なメールです。email: {input.email}")
 
-        # パスワードハッシュ化
-        password = Password(value=input.password)
-        hash_password = password.hash()
-
-        # ユーザ情報をキャッシュに保存
-
-        # キャッシュサーバーに保存するkeyの作成
-
-        # キャッシュのサーバーに保存するvalueを作成
-
-        # 保存
-
-        # メール送信
-
-        return TemporaryRegisterOutputPort(
+        # 一時的なユーザー情報を生成
+        # 確認コードも作成される
+        temp_user = TempUser.generate(
             username=input.username,
             email=input.email,
             password=input.password,
+        )
+        logger.info("一時的なユーザー情報を生成しました。")
+
+        # 一時的なユーザー情報をキャッシュに保存
+        self._temp_user_repository.save(temp_user)
+        logger.info(
+            f"一時的なユーザー情報をキャッシュサーバーに保存しました。temp_user_id: {temp_user.temp_user_id}"
+        )
+
+        # メール送信
+        # TODO: メール送信処理を実装する
+
+        return TemporaryRegisterOutputPort(
+            temp_user_id=str(temp_user.temp_user_id),
         )
