@@ -1,4 +1,4 @@
-from app.domain.value_object.password import Password
+from app.domain.value_object.user.password import Password
 
 
 class TestHashPassword:
@@ -13,7 +13,7 @@ class TestHashPassword:
 
         # assert
         assert actual != input
-    
+
     # ハッシュ化したパスワードと値が一致した場合にTrueを返すこと
     def test__can_verify_password(self):
         # arrange

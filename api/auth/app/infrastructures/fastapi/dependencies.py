@@ -1,4 +1,8 @@
 from app.infrastructures.database.handler.mysql_handler import MysplHandler
+from app.infrastructures.database.handler.redis_handler import RedisHandler
+from app.infrastructures.database.repositories.temp_user.redis_temp_user_repository import (
+    RedisTempUserRepository,
+)
 from app.infrastructures.database.repositories.user.mysql_user_repository import (
     MysqlUserRepository,
 )
@@ -16,6 +20,13 @@ def get_auth_controller() -> AuthController:
                     user="root",
                     password="movie",
                     db="users",
+                )
+            ),
+            temp_user_repository=RedisTempUserRepository(
+                handler=RedisHandler(
+                    host="auth-redis",
+                    port=6379,
+                    db=0,
                 )
             ),
         ),
