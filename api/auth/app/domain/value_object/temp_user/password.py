@@ -1,5 +1,3 @@
-from typing import Any
-
 import bcrypt
 
 from app.domain.value_object.value_object import ValueObject
@@ -18,6 +16,9 @@ class Password(ValueObject):
     # パスワードの検証
     def verify(self, input_password: str):
         return bcrypt.checkpw(self.value, input_password)
+
+    def decode(self) -> str:
+        return self.value.decode('utf-8')
 
     @classmethod
     def generate(cls, password: str) -> "Password":

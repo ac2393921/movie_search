@@ -10,3 +10,4 @@ class Entity(BaseModel):
     @abstractclassmethod
     def generate(cls):
         raise NotImplementedError()
+

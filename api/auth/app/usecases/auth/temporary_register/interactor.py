@@ -6,6 +6,7 @@ from app.domain.entities.temp_user import TempUser
 from app.domain.repositories.temp_user.temp_user_repository import \
     TempUserRepository
 from app.domain.repositories.user.user_repository import UserRepository
+from app.domain.value_object.temp_user.email import Email
 from app.usecases.auth.temporary_register.input_port import \
     TemporaryRegisterInputPort
 from app.usecases.auth.temporary_register.output_port import \
@@ -38,9 +39,9 @@ class TemporaryRegisterInteractor:
             email=input.email,
             password=input.password,
         )
-        logger.info("一時的なユーザー情報を生成しました。")
+        temp_user.generate_confirm_code()
+        logger.info("確認コードを生成しました。")
 
-        # 一時的なユーザー情報をキャッシュに保存
         self._temp_user_repository.save(temp_user)
         logger.info(
             f"一時的なユーザー情報をキャッシュサーバーに保存しました。temp_user_id: {temp_user.temp_user_id}"

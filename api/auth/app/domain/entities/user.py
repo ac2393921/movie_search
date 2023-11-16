@@ -12,7 +12,7 @@ class User(Entity):
     password: Password
 
     @classmethod
-    def generate(cls, username, email, password):
+    def generate(cls, username: str, email: str, password: str):
         return cls(
             user_id=UserId.generate(),
             username=UserName(value=username),
@@ -21,4 +21,4 @@ class User(Entity):
         )
 
     def __str__(self) -> str:
-        return f"{self.user_id} {self.username} {self.email} {self.password}"
+        return f"{self.user_id} {self.username} {self.email} {self.password.decode()}"

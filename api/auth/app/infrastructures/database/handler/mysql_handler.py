@@ -41,3 +41,15 @@ class MysplHandler(SqlHander):
             print(f"Error executing query: {e}")
         finally:
             cursor.close()
+
+    def execute_command(self, query, params=None):
+        cursor = self._conn.cursor()
+        try:
+            cursor.execute(query, params)
+            self._conn.commit()
+            return cursor.rowcount
+        except Exception as e:
+            self._conn.rollback()
+            print(f"Error executing query: {e}")
+        finally:
+            cursor.close()

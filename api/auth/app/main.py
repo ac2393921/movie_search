@@ -1,25 +1,44 @@
-from app.infrastructures.fastapi.dependencies import get_auth_controller
-from fastapi import Depends, FastAPI
-from pydantic import BaseModel
+from logging import getLogger
 
+from fastapi import Depends, FastAPI
+
+from app.infrastructures.fastapi.dependencies import get_auth_controller
+from app.interfaces.controllers.auth_controller import AuthController
+
+logger = getLogger("uvicorn.app")
 app = FastAPI()
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-@app.post("/sign_up", response_model=Token)
-async def sing_up(
+@app.post("/temporary_register")
+async def temporary_register(
     username: str,
     email: str,
     password: str,
-    controller=Depends(
+    controller: AuthController = Depends(
         get_auth_controller,
     ),
 ):
-    output = controller.temporary_register(username, email, password)
-    print(output)
+    try:
+        output = controller.temporary_register(username, email, password)
+    except Exception as e:
+        logger.error(e)
+        return {"error": str(e)}
 
-    return Token(access_token="xxx", token_type="bearer")
+    return {"temp_user_id": output.temp_user_id}
+
+
+@app.post("/register")
+async def register(
+    temp_user_id: str,
+    confirm_code: str,
+    controller: AuthController = Depends(
+        get_auth_controller,
+    ),
+):
+    try:
+        output = controller.register(temp_user_id, confirm_code)
+    except Exception as e:
+        logger.error(e)
+        return {"error": str(e)}
+
+    return {"temp_user_id": output.temp_user_id}

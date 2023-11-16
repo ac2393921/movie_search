@@ -11,3 +11,6 @@ class ValueObject(BaseModel):
 
     def __str__(self) -> str:
         return str(self.value)
+
+    def __eq__(self, __value: object) -> bool:
+        return super().__eq__(__value)
