@@ -1,5 +1,10 @@
+from typing import Any
+
 from pydantic import BaseModel
+
+from app.domain.entities.user import User
 
 
 class RegisterOutputPort(BaseModel):
-    temp_user_id: str
+    user: Any
+    token: str

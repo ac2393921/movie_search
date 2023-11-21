@@ -1,28 +1,27 @@
 from app.domain.value_object.user.password import Password
 
 
-class TestHashPassword:
+class TestUserPassword:
     # パスワードがハッシュ化されていること
     def test__can_hash_password(self):
         # arrange
         input = "password"
-        value_object = Password(value=input)
 
         # act
-        actual = value_object.hash()
+        actual = Password.hash(input)
 
         # assert
         assert actual != input
+        assert isinstance(actual, bytes)
 
     # ハッシュ化したパスワードと値が一致した場合にTrueを返すこと
     def test__can_verify_password(self):
         # arrange
-        expect = "password"
-        value_object = Password(value=expect)
-        hashed_password = value_object.hash()
+        input = "password"
+        value_object = Password.generate(input)
 
         # act
-        actual = value_object.verify(hashed_password)
+        actual = value_object.verify(input)
 
         # assert
         assert actual is True
@@ -31,11 +30,11 @@ class TestHashPassword:
     def test__can_verify_password__when_invalid(self):
         # arrange
         expect = "password"
-        value_object = Password(value=expect)
-        invalid_hashed_password = Password(value="invalid").hash()
+        value_object = Password.generate(expect)
+        invalid_password = "invalid_password"
 
         # act
-        actual = value_object.verify(invalid_hashed_password)
+        actual = value_object.verify(invalid_password)
 
         # assert
         assert actual is False

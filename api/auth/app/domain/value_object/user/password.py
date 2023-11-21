@@ -15,7 +15,7 @@ class Password(ValueObject):
 
     # パスワードの検証
     def verify(self, input_password: str):
-        return bcrypt.checkpw(self.value, input_password)
+        return bcrypt.checkpw(input_password.encode("utf-8"), self.value)
 
     def decode(self) -> str:
         return self.value.decode('utf-8')
@@ -27,3 +27,6 @@ class Password(ValueObject):
 
     def __str__(self) -> str:
         return str(self.value, "utf-8")
+
+    def __eq__(self, __value: object) -> bool:
+        return super().__eq__(__value)

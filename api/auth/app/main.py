@@ -41,4 +41,4 @@ async def register(
         logger.error(e)
         return {"error": str(e)}
 
-    return {"temp_user_id": output.temp_user_id}
+    return {"user": output.user, "token": output.token}

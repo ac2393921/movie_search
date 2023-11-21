@@ -1,5 +1,6 @@
 from logging import getLogger
 
+from app.domain.domain_service.token_generator import TokenGenerator
 from app.domain.entities.temp_user import TempUser
 from app.domain.entities.user import User
 from app.domain.repositories.temp_user.temp_user_repository import \
@@ -40,10 +41,13 @@ class RegisterInteractor:
             email=temp_user.email.value,
             password=temp_user.password.value,
         )
-        user = self._user_repository.save(user)
+        self._user_repository.save(user)
 
         # JWTを作成
+        token = TokenGenerator().generate_token(user)
+        logger.info(f"token: {token}")
 
         return RegisterOutputPort(
-            temp_user_id=str("aaaaa"),
+            user=User,
+            token=token,
         )
