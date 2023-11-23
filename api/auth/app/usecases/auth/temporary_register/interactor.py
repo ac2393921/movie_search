@@ -29,7 +29,7 @@ class TemporaryRegisterInteractor:
         user_existence_checker = UserExistenceChecker(
             user_repository=self._user_repository,
         )
-        user_existence_checker.check_by_email(input.email)
+        user_existence_checker.check_not_exist_by_email(input.email)
         logger.info(f"登録可能なメールです。email: {input.email}")
 
         # 一時的なユーザー情報を生成

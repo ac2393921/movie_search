@@ -18,8 +18,8 @@ class MysqlUserRepository(UserRepository):
         with self._handler as _:
             results_with_where = self._handler.execute_query(query, email)
             for row in results_with_where:
-                user = User(
-                    id=row["id"],
+                user = User.regenerate(
+                    user_id=row["id"],
                     username=row["username"],
                     email=row["email"],
                     password=row["password"],

@@ -42,3 +42,20 @@ async def register(
         return {"error": str(e)}
 
     return {"user": output.user, "token": output.token}
+
+
+@app.post("/signin")
+async def signin(
+    email: str,
+    password: str,
+    controller: AuthController = Depends(
+        get_auth_controller,
+    ),
+):
+    try:
+        output = controller.signin(email, password)
+    except Exception as e:
+        logger.error(e)
+        return {"error": str(e)}
+
+    return {"token": output.token}
