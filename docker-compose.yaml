@@ -1,20 +1,20 @@
 version: "3.9"
 services:
-  api:
-    build:
-      context: ./api/search_movie_api
-      dockerfile: docker/Dockerfile
-      target: develop
-    volumes:
-      - ./api/search_movie_api/:/src
-    working_dir: "/src"
-    tty: true
-    ports: 
-      - "5000:5000"
-    restart: always
-    depends_on:
-      - db
-    command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
+  # api:
+  #   build:
+  #     context: ./api/search_movie_api
+  #     dockerfile: docker/Dockerfile
+  #     target: develop
+  #   volumes:
+  #     - ./api/search_movie_api/:/src
+  #   working_dir: "/src"
+  #   tty: true
+  #   ports: 
+  #     - "5000:5000"
+  #   restart: always
+  #   depends_on:
+  #     - db
+  #   command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
 
   be:
     build:
@@ -72,19 +72,43 @@ services:
       - ./fe/src:/opt/app
     ports:
       - "3000:3000"
-
-  mongo:
-    image: mongo
-    command: --replSet rs0
-    container_name: mongo
-    restart: always
-    ports:
-      - "27017:27017"
-      - "28017:28017"
-    volumes:
-      - ./data/mongo:/data/db
     networks:
       - app-net
+
+  mongo:
+    container_name: mongo
+    build:
+      context: .
+      dockerfile: docker/mongo/Dockerfile
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: user
+      MONGO_REPLICA_HOST: host.docker.internal
+      MONGO_REPLICA_PORT: 27017
+    volumes:
+      - mongoData:/app:cached
+    restart: always
+    networks:
+      - app-net
+
+  # mongo:
+  #   # image: mongo
+  #   build:
+  #     context: .
+  #     dockerfile: docker/mongo/Dockerfile
+  #   # command: --replSet rs0
+  #   container_name: mongo
+  #   restart: always
+  #   ports:
+  #     - "27017:27017"
+  #     - "28017:28017"
+  #   volumes:
+  #     - ./data/mongo:/data/db
+  #   networks:
+  #     - app-net
 
   mongo-express:
     image: mongo-express
@@ -94,8 +118,11 @@ services:
     depends_on:
       - mongo
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://@mongo:27017/
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
       ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: root
     networks:
       - app-net
 
@@ -124,6 +151,7 @@ services:
 
 volumes:
   db_data:
+  mongoData:
 
 networks:
   app-net:
