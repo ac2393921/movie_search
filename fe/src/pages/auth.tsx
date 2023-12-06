@@ -1,16 +1,15 @@
 import axios from 'axios';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/router';
 import { useCallback, useState } from "react";
 import Input from "../components/input";
 
+import { useRouter } from 'next/router';
 import { FaGithub } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 
 
 const Auth = () => {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -27,10 +26,10 @@ const Auth = () => {
         email,
         password,
         redirect: false,
-        callbackUrl: '/'
+        callbackUrl: '/profiles'
       });
 
-      router.push('/');
+      router.push('/profiles');
     } catch (error) {
       console.log(error);
     }
