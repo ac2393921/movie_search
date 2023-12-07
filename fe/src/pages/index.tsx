@@ -1,3 +1,4 @@
+import Billboard from '@/components/Billboard';
 import Navbar from '@/components/Navbar';
 import useCurentUser from '@/hooks/useCurrentUser';
 import { NextPage } from 'next';
@@ -28,6 +29,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
+      <Billboard />
     </>
   )
 }
