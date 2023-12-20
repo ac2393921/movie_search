@@ -1,10 +1,9 @@
-import Billboard from '@/components/Billboard';
-import Navbar from '@/components/Navbar';
-import useCurentUser from '@/hooks/useCurrentUser';
-import { NextPage } from 'next';
-import { getSession } from 'next-auth/react';
-
-
+import Billboard from "@/components/Billboard";
+import MovieList from "@/components/MovieList";
+import Navbar from "@/components/Navbar";
+import useMovies from "@/hooks/useMovieList";
+import { NextPage } from "next";
+import { getSession } from "next-auth/react";
 
 export async function getServerSideProps(context: NextPage) {
   const session = await getSession(context);
@@ -12,24 +11,27 @@ export async function getServerSideProps(context: NextPage) {
   if (!session) {
     return {
       redirect: {
-        destination: '/auth',
-        permanent: false
-      }
-    }
+        destination: "/auth",
+        permanent: false,
+      },
+    };
   }
 
   return {
-    props: {}
-  }
+    props: {},
+  };
 }
 
-
 export default function Home() {
-  const { data: user } = useCurentUser();
+  const { data: movies } = useMovies();
+
   return (
     <>
       <Navbar />
       <Billboard />
+      <div className="pb-40">
+        <MovieList title="Trending Now" data={movies} />
+      </div>
     </>
-  )
+  );
 }
