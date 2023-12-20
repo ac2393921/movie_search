@@ -5,7 +5,6 @@ interface MovieCardProps {
 }
 
 const MovieCard: React.FC<MovieCardProps> = ({ data }) => {
-  console.log("data is", data);
   return (
     <div className="group bg-zinc-900 col-span relative h-[12vw]">
       <img src={data.thumbnailUrl} alt="Movie" draggable={false} className="
